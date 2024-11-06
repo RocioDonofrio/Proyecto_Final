@@ -112,11 +112,7 @@ export default function Configuracion() {
               Email: {auth.currentUser?.email}
             </Text>
           </View>
-          <TouchableOpacity onPress={toggleTheme}>
-            <Text style={[styles.link, { color: theme.color }]}>
-              Cambiar tema temporalmente
-            </Text>
-          </TouchableOpacity>
+
           <TouchableOpacity
             style={styles.editButton}
             onPress={handleEditProfile}

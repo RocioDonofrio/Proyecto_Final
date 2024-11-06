@@ -19,16 +19,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   buttonIncendio: {
-    backgroundColor: "#d61b1b", // Color para el botón Incendio
+    backgroundColor: "#d61b1b",
   },
   buttonAccidente: {
-    backgroundColor: "#ea7033", // Color para el botón Accidente
+    backgroundColor: "#ea7033",
   },
   buttonRescate: {
-    backgroundColor: "#fae12f", // Color para el botón Rescate
+    backgroundColor: "#fae12f",
   },
   buttonOtro: {
-    backgroundColor: "#ffee71", // Color para el botón Otro
+    backgroundColor: "#ffee71",
   },
   buttonText: {
     color: "#fff",

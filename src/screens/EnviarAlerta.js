@@ -38,12 +38,6 @@ const EnviarAlerta = ({ navigation }) => {
             Rescate
           </Text>
         </TouchableOpacity>
-
-        <TouchableOpacity onPress={toggleTheme}>
-          <Text style={[styles.link, { color: theme.color }]}>
-            Cambiar tema temporalmente
-          </Text>
-        </TouchableOpacity>
       </View>
     </View>
   );

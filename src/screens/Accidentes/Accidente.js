@@ -1,74 +1,91 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   TextInput,
+  TouchableOpacity,
+  Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
 } from "react-native";
+import email from "react-native-email";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { app, db } from "../../../credenciales";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../../context/ThemeContext";
+import { useNavigation } from "@react-navigation/native";
 
-const Accidente = ({ navigation }) => {
+const firestore = getFirestore(app);
+
+export default function EnviarFormulario() {
   const [location, setLocation] = useState("");
   const [rescueType, setRescueType] = useState("");
   const [description, setDescription] = useState("");
   const [peopleRescued, setPeopleRescued] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const { theme, toggleTheme } = useTheme();
+  const [usuarios, setUsuarios] = useState([]);
 
-  const handleSubmit = () => {
+  const navigation = useNavigation();
+
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(firestore, "usuarios"));
+        const usuariosData = querySnapshot.docs.map((doc) => doc.data().email);
+        setUsuarios(usuariosData);
+      } catch (error) {
+        console.error("Error al obtener los usuarios:", error);
+      }
+    };
+    fetchUsuarios();
+  }, []);
+
+  const handleEnviarCorreo = () => {
     if (!location || !rescueType || !description) {
-      Alert.alert("Error", "Por favor, completa todos los campos requeridos.");
+      Alert.alert("Error", "Por favor completa todos los campos requeridos.");
       return;
     }
 
-    // Muestra un mensaje de éxito en lugar de enviar la alerta a Firebase
-    Alert.alert(
-      "🚨 Alerta Enviada!",
-      `El reporte del Accidente ha sido enviado correctamente.\n\nDetalles:\nUbicación: ${location}\nTipo de Accidente: ${rescueType}\nDescripción: ${description}\nPersonas Rescatadas: ${
-        peopleRescued || "N/A"
-      }\nObservaciones: ${additionalInfo || "N/A"}`
-    );
+    const to = usuarios;
+    const subject = "🚨 Reporte de Accidente";
+    const body = `
+      🚨 Reporte de Accidente 🚨
 
-    // Limpia los campos del formulario
-    setLocation("");
-    setRescueType("");
-    setDescription("");
-    setPeopleRescued("");
-    setAdditionalInfo("");
+      Detalles:
+      Ubicación: ${location}
+      Tipo de Accidente: ${rescueType}
+      Descripción: ${description}
+      Personas Rescatadas: ${peopleRescued || "N/A"}
+      Observaciones: ${additionalInfo || "N/A"}
+    `;
+
+    email(to, {
+      subject: subject,
+      body: body,
+    }).catch(console.error);
   };
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
-      <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#e53935" />
-        </TouchableOpacity>
-        <Text style={styles.headerTitle}>Reporte de Accidente</Text>
-      </View>
-
       <ScrollView
-        contentContainerStyle={styles.scrollContainer}
+        contentContainerStyle={styles.container}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity onPress={toggleTheme}>
-          <Text style={[styles.link, { color: theme.color }]}>
-            Cambiar tema temporalmente
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Reporte de Accidente</Text>
+        <View style={styles.header}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={40} color="black" />
+          </TouchableOpacity>
+          <Text style={styles.title}>Reporte de Accidente</Text>
+        </View>
 
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="location" size={30} color="#e53935" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Ubicación
-            </Text>
+            <Text style={styles.label}>Ubicación</Text>
           </View>
           <TextInput
             style={styles.input}
@@ -79,12 +96,11 @@ const Accidente = ({ navigation }) => {
           />
         </View>
 
+        {/* Tipo de Accidente */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="alert-circle" size={30} color="#e53935" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Tipo de Accidente
-            </Text>
+            <Text style={styles.label}>Tipo de Accidente</Text>
           </View>
           <TextInput
             style={styles.input}
@@ -95,12 +111,11 @@ const Accidente = ({ navigation }) => {
           />
         </View>
 
+        {/* Descripción */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="document-text-outline" size={30} color="#e53935" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Descripción
-            </Text>
+            <Text style={styles.label}>Descripción</Text>
           </View>
           <TextInput
             style={[styles.input, styles.textArea]}
@@ -112,12 +127,11 @@ const Accidente = ({ navigation }) => {
           />
         </View>
 
+        {/* Personas Rescatadas */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="people" size={30} color="#e53935" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Personas Rescatadas
-            </Text>
+            <Text style={styles.label}>Personas Rescatadas</Text>
           </View>
           <TextInput
             style={styles.input}
@@ -129,12 +143,11 @@ const Accidente = ({ navigation }) => {
           />
         </View>
 
+        {/* Observaciones */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="information-circle" size={30} color="#e53935" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Observaciones
-            </Text>
+            <Text style={styles.label}>Observaciones</Text>
           </View>
           <TextInput
             style={[styles.input, styles.textArea]}
@@ -146,45 +159,30 @@ const Accidente = ({ navigation }) => {
           />
         </View>
 
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Enviar Reporte</Text>
+        {/* Botón de Enviar */}
+        <TouchableOpacity style={styles.button} onPress={handleEnviarCorreo}>
+          <Text style={styles.buttonText}>Enviar Reporte</Text>
         </TouchableOpacity>
       </ScrollView>
-    </View>
+    </KeyboardAvoidingView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: "#fefefe",
-  },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    marginTop: 40,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#e53935",
-    marginLeft: 10,
-  },
-  scrollContainer: {
-    paddingHorizontal: 24,
-    paddingVertical: 20,
+    padding: 20,
     flexGrow: 1,
   },
+  backButton: {
+    alignSelf: "flex-start",
+    marginBottom: 10,
+  },
   title: {
-    fontSize: 30,
+    fontSize: 24,
     fontWeight: "bold",
     color: "#e53935",
-    marginBottom: 20,
     textAlign: "center",
+    marginBottom: 20,
   },
   formGroup: {
     marginBottom: 15,
@@ -195,37 +193,35 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   label: {
-    fontSize: 20,
+    fontSize: 18,
     color: "#444",
-    marginLeft: 12,
+    marginLeft: 8,
   },
   input: {
-    height: 60,
+    height: 50,
     borderColor: "#ccc",
     borderWidth: 1.5,
-    borderRadius: 12,
+    borderRadius: 10,
     paddingHorizontal: 16,
     backgroundColor: "#fff",
-    fontSize: 18,
+    fontSize: 16,
     color: "#333",
   },
   textArea: {
-    height: 120,
+    height: 100,
     textAlignVertical: "top",
     paddingTop: 12,
   },
-  submitButton: {
+  button: {
     backgroundColor: "#e53935",
-    paddingVertical: 18,
+    paddingVertical: 12,
     borderRadius: 25,
     alignItems: "center",
-    marginTop: 10,
+    marginTop: 20,
   },
-  submitButtonText: {
+  buttonText: {
     color: "#fff",
-    fontSize: 20,
+    fontSize: 18,
     fontWeight: "bold",
   },
 });
-
-export default Accidente;

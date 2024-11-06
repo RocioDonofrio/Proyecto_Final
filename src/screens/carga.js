@@ -13,7 +13,6 @@ const Carga = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Image source={require("../assets/logo.png")} style={styles.logo} />
-      <Text style={styles.textoCargando}>Cargando...</Text>
     </View>
   );
 };

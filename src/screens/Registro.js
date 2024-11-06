@@ -202,11 +202,6 @@ export default function Registro() {
               <Text style={styles.TextoBoton}>Registrarse</Text>
             )}
           </TouchableOpacity>
-          <TouchableOpacity onPress={toggleTheme}>
-            <Text style={[styles.link, { color: theme.color }]}>
-              Cambiar tema temporalmente
-            </Text>
-          </TouchableOpacity>
         </View>
       </ScrollView>
     </KeyboardAvoidingView>

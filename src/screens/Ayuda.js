@@ -101,7 +101,16 @@ const Ayuda = () => {
             4. Coordinar con otros equipos de emergencia.
           </Text>
         </View>
-
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Codigo Q</Text>
+          <Text style={styles.sectionContent}>
+            QRU: Se utiliza para preguntar o informar si hay mensajes o
+            información que intercambiar.{"\n"}
+            QRT: Indica que se finalizará la transmisión o que el operador ya no
+            estará en línea.{"\n"}
+            QRV: Indica disponibilidad para recibir o transmitir mensajes.
+          </Text>
+        </View>
         {notes.length > 0 && (
           <View style={styles.notesSection}>
             <Text style={styles.sectionTitle}>Notas de Ayuda</Text>

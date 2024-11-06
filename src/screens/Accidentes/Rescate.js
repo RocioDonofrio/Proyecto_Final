@@ -46,11 +46,6 @@ const Rescate = ({ navigation }) => {
         contentContainerStyle={styles.scrollContainer}
         keyboardShouldPersistTaps="handled"
       >
-        <TouchableOpacity onPress={toggleTheme}>
-          <Text style={[styles.link, { color: theme.color }]}>
-            Cambiar tema temporalmente
-          </Text>
-        </TouchableOpacity>
         <Text style={styles.title}>Reporte de Rescate</Text>
 
         <View style={styles.formGroup}>

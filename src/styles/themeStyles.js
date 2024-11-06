@@ -1,4 +1,3 @@
-// themeStyles.js
 export const lightTheme = {
   backgroundColor: "#ffffff",
   color: "#000000",

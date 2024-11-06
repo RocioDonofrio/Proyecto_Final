@@ -4,7 +4,6 @@ import Registro from "./src/screens/Registro";
 
 import EnviarAlerta from "./src/screens/EnviarAlerta";
 import Disponibilidad from "./src/screens/Disponibilidad";
-import Turnos from "./src/screens/Turnos";
 import Ayuda from "./src/screens/Ayuda";
 import Accidente from "./src/screens/Accidentes/Accidente";
 import Incendio from "./src/screens/Accidentes/Incendio";
@@ -14,7 +13,6 @@ import Configuracion from "./src/screens/Configuracion";
 import EditProfile from "./src/screens/EditProfile";
 import { ThemeProvider } from "./src/context/ThemeContext";
 
-//import "react-native-gesture-handler";
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -57,7 +55,7 @@ export default function App() {
               name="EnviarAlerta"
               component={EnviarAlerta}
               options={{
-                header: () => <Header title="Enviar Alerta" />,
+                header: () => <Header title="Enviar " />,
               }}
             />
             <Stack.Screen
@@ -67,13 +65,7 @@ export default function App() {
                 header: () => <Header title="Disponibilidad" />,
               }}
             />
-            <Stack.Screen
-              name="Turnos"
-              component={Turnos}
-              options={{
-                header: () => <Header title="Turnos" />,
-              }}
-            />
+
             <Stack.Screen
               name="Ayuda"
               component={Ayuda}

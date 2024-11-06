@@ -50,7 +50,8 @@ export default function Login() {
     try {
       await signInWithEmailAndPassword(auth, email, password);
       Alert.alert("Inicio de sesión exitoso", "Bienvenido!");
-      navigation.navigate("EnviarAlerta");
+      navigation.replace("EnviarAlerta");
+
       setEmail("");
       setPassword("");
     } catch (error) {
@@ -175,11 +176,6 @@ export default function Login() {
           <TouchableOpacity onPress={handleForgotPassword}>
             <Text style={[styles.link, { color: theme.color }]}>
               ¿Olvidaste tu contraseña?
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={toggleTheme}>
-            <Text style={[styles.link, { color: theme.color }]}>
-              Cambiar tema temporalmente
             </Text>
           </TouchableOpacity>
         </View>

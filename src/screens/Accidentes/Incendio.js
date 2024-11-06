@@ -1,222 +1,224 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   View,
-  Text,
   TextInput,
+  TouchableOpacity,
+  Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   Alert,
+  KeyboardAvoidingView,
+  Platform,
+  Keyboard,
+  TouchableWithoutFeedback,
 } from "react-native";
+import email from "react-native-email";
+import { getFirestore, collection, getDocs } from "firebase/firestore";
+import { app, db } from "../../../credenciales";
 import { Ionicons } from "@expo/vector-icons";
-import { useTheme } from "../../context/ThemeContext";
+import { useNavigation } from "@react-navigation/native";
 
-const Incendio = ({ navigation }) => {
+const firestore = getFirestore(app);
+
+export default function EnviarFormulario() {
   const [location, setLocation] = useState("");
-  const [description, setDescription] = useState("");
-  const [peopleAffected, setPeopleAffected] = useState("");
   const [fireType, setFireType] = useState("");
+  const [description, setDescription] = useState("");
+  const [peopleRescued, setPeopleRescued] = useState("");
   const [additionalInfo, setAdditionalInfo] = useState("");
-  const { theme, toggleTheme } = useTheme();
+  const [usuarios, setUsuarios] = useState([]);
+  const navigation = useNavigation();
 
-  const handleSubmit = () => {
-    Alert.alert(
-      "Alerta de Incendio Enviada",
-      "La alerta de incendio ha sido enviada correctamente."
-    );
-    setLocation("");
-    setDescription("");
-    setPeopleAffected("");
-    setFireType("");
-    setAdditionalInfo("");
+  useEffect(() => {
+    const fetchUsuarios = async () => {
+      try {
+        const querySnapshot = await getDocs(collection(firestore, "usuarios"));
+        const usuariosData = querySnapshot.docs.map((doc) => doc.data().email);
+        setUsuarios(usuariosData);
+      } catch (error) {
+        console.error("Error al obtener los usuarios:", error);
+      }
+    };
+    fetchUsuarios();
+  }, []);
+
+  const handleEnviarCorreo = () => {
+    if (!location || !fireType || !description) {
+      Alert.alert("Error", "Por favor completa todos los campos requeridos.");
+      return;
+    }
+
+    const to = usuarios;
+    const subject = "Reporte de Incendio";
+    const body = `
+       Incendio
+
+      Detalles:
+      Ubicación: ${location}
+      Tipo de incendio: ${fireType}
+      Descripción: ${description}
+      Personas Rescatadas: ${peopleRescued || "N/A"}
+      Observaciones: ${additionalInfo || "N/A"}
+    `;
+
+    email(to, {
+      subject: subject,
+      body: body,
+    }).catch(console.error);
   };
 
   return (
-    <View
-      style={[styles.container, { backgroundColor: theme.backgroundColor }]}
+    <KeyboardAvoidingView
+      style={styles.container}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
     >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#ff7043" />
+          <Ionicons name="arrow-back" size={40} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Reporte de Incendio</Text>
       </View>
 
-      <ScrollView
-        contentContainerStyle={styles.scrollContainer}
-        keyboardShouldPersistTaps="handled"
-      >
-        <TouchableOpacity onPress={toggleTheme}>
-          <Text style={[styles.link, { color: theme.color }]}>
-            Cambiar tema temporalmente
-          </Text>
-        </TouchableOpacity>
-        <Text style={styles.title}>Reporte de Incendio</Text>
-
-        <View style={styles.formGroup}>
-          <View style={styles.labelContainer}>
-            <Ionicons name="location-outline" size={24} color="#ff7043" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Ubicación del Incendio
-            </Text>
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="Dirección o coordenadas"
-            placeholderTextColor="#aaa"
-            value={location}
-            onChangeText={setLocation}
-          />
-        </View>
-
-        <View style={styles.formGroup}>
-          <View style={styles.labelContainer}>
-            <Ionicons name="clipboard-outline" size={24} color="#ff7043" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Descripción del Incendio
-            </Text>
-          </View>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Detalles del incidente"
-            placeholderTextColor="#aaa"
-            value={description}
-            onChangeText={setDescription}
-            multiline
-          />
-        </View>
-
-        <View style={styles.formGroup}>
-          <View style={styles.labelContainer}>
-            <Ionicons name="people-outline" size={24} color="#ff7043" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Personas Afectadas
-            </Text>
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="Cantidad de personas en peligro"
-            placeholderTextColor="#aaa"
-            value={peopleAffected}
-            onChangeText={setPeopleAffected}
-            keyboardType="numeric"
-          />
-        </View>
-
-        <View style={styles.formGroup}>
-          <View style={styles.labelContainer}>
-            <Ionicons name="flame-outline" size={24} color="#ff7043" />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Tipo de Incendio
-            </Text>
-          </View>
-          <TextInput
-            style={styles.input}
-            placeholder="Residencial, Forestal, Industrial"
-            placeholderTextColor="#aaa"
-            value={fireType}
-            onChangeText={setFireType}
-          />
-        </View>
-
-        <View style={styles.formGroup}>
-          <View style={styles.labelContainer}>
-            <Ionicons
-              name="information-circle-outline"
-              size={24}
-              color="#ff7043"
+      <TouchableWithoutFeedback onPress={() => Keyboard.dismiss()}>
+        <ScrollView contentContainerStyle={styles.scrollView}>
+          <Text style={styles.title}>Reporte de Incendio</Text>
+          <View style={styles.formGroup}>
+            <View style={styles.labelContainer}>
+              <Ionicons name="location" size={30} color="#e53935" />
+              <Text style={styles.label}>Ubicación</Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="¿Dónde es?"
+              placeholderTextColor="#777"
+              value={location}
+              onChangeText={setLocation}
             />
-            <Text style={[styles.label, { color: theme.color }]}>
-              Observaciones
-            </Text>
           </View>
-          <TextInput
-            style={[styles.input, styles.textArea]}
-            placeholder="Detalles adicionales"
-            placeholderTextColor="#aaa"
-            value={additionalInfo}
-            onChangeText={setAdditionalInfo}
-            multiline
-          />
-        </View>
-
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.submitButtonText}>Enviar Alerta</Text>
-        </TouchableOpacity>
-      </ScrollView>
-    </View>
+          <View style={styles.formGroup}>
+            <View style={styles.labelContainer}>
+              <Ionicons name="alert-circle" size={30} color="#e53935" />
+              <Text style={styles.label}>Tipo de Incendio</Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Ej: Estructural, Forestal"
+              placeholderTextColor="#777"
+              value={fireType}
+              onChangeText={setFireType}
+            />
+          </View>
+          {/* Descripción */}
+          <View style={styles.formGroup}>
+            <View style={styles.labelContainer}>
+              <Ionicons
+                name="document-text-outline"
+                size={30}
+                color="#e53935"
+              />
+              <Text style={styles.label}>Descripción</Text>
+            </View>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Describe lo sucedido"
+              placeholderTextColor="#777"
+              value={description}
+              onChangeText={setDescription}
+              multiline
+            />
+          </View>
+          {/* Personas Rescatadas */}
+          <View style={styles.formGroup}>
+            <View style={styles.labelContainer}>
+              <Ionicons name="people" size={30} color="#e53935" />
+              <Text style={styles.label}>Personas Rescatadas</Text>
+            </View>
+            <TextInput
+              style={styles.input}
+              placeholder="Cantidad de personas"
+              placeholderTextColor="#777"
+              value={peopleRescued}
+              onChangeText={setPeopleRescued}
+              keyboardType="numeric"
+            />
+          </View>
+          {/* Observaciones */}
+          <View style={styles.formGroup}>
+            <View style={styles.labelContainer}>
+              <Ionicons name="information-circle" size={30} color="#e53935" />
+              <Text style={styles.label}>Observaciones</Text>
+            </View>
+            <TextInput
+              style={[styles.input, styles.textArea]}
+              placeholder="Información adicional"
+              placeholderTextColor="#777"
+              value={additionalInfo}
+              onChangeText={setAdditionalInfo}
+              multiline
+            />
+          </View>
+          {/* Botón de Enviar */}
+          <TouchableOpacity style={styles.button} onPress={handleEnviarCorreo}>
+            <Text style={styles.buttonText}>Enviar Reporte</Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </TouchableWithoutFeedback>
+    </KeyboardAvoidingView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#ffeccd",
+    padding: 20,
   },
-  header: {
-    flexDirection: "row",
-    alignItems: "center",
-    padding: 16,
-    backgroundColor: "#fff",
-    borderBottomWidth: 1,
-    borderBottomColor: "#ccc",
-    marginTop: 40,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    color: "#ff7043",
-    marginLeft: 10,
-  },
-  scrollContainer: {
-    padding: 16,
+  scrollView: {
     flexGrow: 1,
   },
   title: {
-    fontSize: 26,
+    fontSize: 24,
     fontWeight: "bold",
-    color: "#ff7043",
-    marginBottom: 20,
+    color: "#e53935",
     textAlign: "center",
+    marginBottom: 20,
   },
   formGroup: {
-    marginBottom: 20,
+    marginBottom: 15,
   },
   labelContainer: {
     flexDirection: "row",
     alignItems: "center",
-    marginBottom: 5,
+    marginBottom: 8,
   },
   label: {
     fontSize: 18,
-    color: "#333",
-    marginLeft: 10,
+    color: "#444",
+    marginLeft: 8,
   },
   input: {
     height: 50,
     borderColor: "#ccc",
-    borderWidth: 1,
+    borderWidth: 1.5,
     borderRadius: 10,
-    paddingHorizontal: 15,
+    paddingHorizontal: 16,
     backgroundColor: "#fff",
     fontSize: 16,
+    color: "#333",
   },
   textArea: {
-    height: 120,
+    height: 100,
     textAlignVertical: "top",
+    paddingTop: 12,
   },
-  submitButton: {
-    backgroundColor: "#ff7043",
-    paddingVertical: 15,
-    borderRadius: 30,
+  button: {
+    backgroundColor: "#e53935",
+    paddingVertical: 12,
+    borderRadius: 25,
     alignItems: "center",
-    marginTop: 30,
+    marginTop: 20,
   },
-  submitButtonText: {
+  buttonText: {
     color: "#fff",
     fontSize: 18,
     fontWeight: "bold",
   },
 });
-
-export default Incendio;

@@ -75,11 +75,7 @@ const Header = ({ title }) => {
             >
               <Text>Configuracion</Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={toggleTheme}>
-              <Text style={[styles.link, { color: theme.color }]}>
-                Cambiar tema temporalmente
-              </Text>
-            </TouchableOpacity>
+
             <TouchableOpacity style={styles.closeButton} onPress={toggleModal}>
               <Text style={styles.closeText}>Cerrar</Text>
             </TouchableOpacity>
