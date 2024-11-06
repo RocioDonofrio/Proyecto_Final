@@ -6,92 +6,84 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
+  Image,
   KeyboardAvoidingView,
+  Platform,
   ScrollView,
   ActivityIndicator,
   RefreshControl,
-  Platform,
-  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import appFirebase from "../../credenciales";
-import {
-  getAuth,
-  signInWithEmailAndPassword,
-  sendPasswordResetEmail,
-} from "firebase/auth";
 import { useTheme } from "../context/ThemeContext";
+import appFirebase from "../../credenciales";
+import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import { getFirestore, doc, setDoc } from "firebase/firestore";
 
 const auth = getAuth(appFirebase);
+const firestore = getFirestore(appFirebase);
 
-export default function Login() {
+export default function Registro() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [numeroBombero, setNumeroBombero] = useState("");
+  const [nombreCompleto, setNombreCompleto] = useState("");
   const [loading, setLoading] = useState(false);
   const [refreshing, setRefreshing] = useState(false);
   const navigation = useNavigation();
   const { theme, toggleTheme } = useTheme();
 
-  const isEmailValid = (email) => {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  };
+  const handleRegister = async () => {
+    if (
+      !email ||
+      !password ||
+      !confirmPassword ||
+      !numeroBombero ||
+      !nombreCompleto
+    ) {
+      Alert.alert("Error", "Por favor, completa todos los campos");
+      return;
+    }
 
-  const handleLogin = async () => {
-    if (!isEmailValid(email)) {
-      Alert.alert(
-        "Error",
-        "Por favor, introduce un correo electrónico válido."
-      );
+    if (password.length < 6) {
+      Alert.alert("Error", "La contraseña debe tener al menos 6 caracteres");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      Alert.alert("Error", "Las contraseñas no coinciden");
       return;
     }
 
     setLoading(true);
+
     try {
-      await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Inicio de sesión exitoso", "Bienvenido!");
-      navigation.navigate("EnviarAlerta");
-      setEmail("");
-      setPassword("");
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
+
+      await setDoc(doc(firestore, "usuarios", userCredential.user.uid), {
+        email: email,
+        numeroBombero: numeroBombero,
+        nombreCompleto: nombreCompleto,
+      });
+
+      Alert.alert("Registro exitoso", "Ahora puedes iniciar sesión");
+      navigation.navigate("InicioSesion");
     } catch (error) {
-      let errorMessage;
-      switch (error.code) {
-        case "auth/user-not-found":
-          errorMessage = "No hay usuario registrado con este correo.";
-          break;
-        case "auth/wrong-password":
-          errorMessage = "La contraseña es incorrecta.";
-          break;
-        case "auth/invalid-email":
-          errorMessage = "El correo electrónico no es válido.";
-          break;
-        default:
-          errorMessage = "Ocurrió un error. Intenta nuevamente.";
+      let errorMessage = "Error al registrarse. Inténtalo de nuevo.";
+      if (error.code === "auth/email-already-in-use") {
+        errorMessage = "Este correo ya está en uso.";
+      } else if (error.code === "auth/invalid-email") {
+        errorMessage = "Correo electrónico no válido.";
+      } else if (error.code === "auth/weak-password") {
+        errorMessage = "La contraseña es demasiado débil.";
       }
       Alert.alert("Error", errorMessage);
-      setEmail("");
-      setPassword("");
     } finally {
       setLoading(false);
-    }
-  };
-
-  const handleForgotPassword = async () => {
-    if (!isEmailValid(email)) {
-      Alert.alert(
-        "Error",
-        "Por favor, introduce un correo electrónico válido."
-      );
-      return;
-    }
-    try {
-      await sendPasswordResetEmail(auth, email);
-      Alert.alert(
-        "Éxito",
-        "Te hemos enviado un correo para restablecer tu contraseña."
-      );
-    } catch (error) {
-      Alert.alert("Error", "Ocurrió un error al enviar el correo.");
     }
   };
 
@@ -99,10 +91,15 @@ export default function Login() {
     setRefreshing(true);
     setEmail("");
     setPassword("");
+    setConfirmPassword("");
+    setNumeroBombero("");
+    setNombreCompleto("");
     setTimeout(() => {
       setRefreshing(false);
     }, 1000);
   };
+
+  const { colors } = useTheme();
 
   return (
     <KeyboardAvoidingView
@@ -125,7 +122,7 @@ export default function Login() {
             <Image source={require("../assets/logo.png")} style={styles.logo} />
           </View>
           <Text style={[styles.title, { color: theme.color }]}>
-            Iniciar Sesión
+            Registrarse
           </Text>
           <TextInput
             placeholder="Correo"
@@ -154,8 +151,46 @@ export default function Login() {
               },
             ]}
           />
+          <TextInput
+            placeholder="Confirmar Contraseña"
+            value={confirmPassword}
+            onChangeText={setConfirmPassword}
+            secureTextEntry
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.borderColor,
+              },
+            ]}
+          />
+          <TextInput
+            placeholder="Número de Bombero"
+            value={numeroBombero}
+            onChangeText={setNumeroBombero}
+            keyboardType="numeric"
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.borderColor,
+              },
+            ]}
+          />
+          <TextInput
+            placeholder="Nombre Completo"
+            value={nombreCompleto}
+            onChangeText={setNombreCompleto}
+            style={[
+              styles.input,
+              {
+                backgroundColor: theme.inputBackground,
+                borderColor: theme.borderColor,
+              },
+            ]}
+          />
           <TouchableOpacity
-            onPress={handleLogin}
+            onPress={handleRegister}
             style={[
               styles.cajaBoton,
               { backgroundColor: theme.buttonBackground },
@@ -164,18 +199,8 @@ export default function Login() {
             {loading ? (
               <ActivityIndicator size="small" color="#ffffff" />
             ) : (
-              <Text style={styles.TextoBoton}>Iniciar Sesión</Text>
+              <Text style={styles.TextoBoton}>Registrarse</Text>
             )}
-          </TouchableOpacity>
-          <TouchableOpacity onPress={() => navigation.navigate("Registro")}>
-            <Text style={[styles.link, { color: theme.color }]}>
-              No tienes cuenta? Regístrate
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={handleForgotPassword}>
-            <Text style={[styles.link, { color: theme.color }]}>
-              ¿Olvidaste tu contraseña?
-            </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={toggleTheme}>
             <Text style={[styles.link, { color: theme.color }]}>
@@ -235,6 +260,7 @@ const styles = StyleSheet.create({
     paddingVertical: 20,
     width: "60%",
     marginTop: 20,
+    flexDirection: "row",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -242,8 +268,5 @@ const styles = StyleSheet.create({
     color: "white",
     fontWeight: "bold",
     textAlign: "center",
-  },
-  link: {
-    marginTop: 15,
   },
 });
