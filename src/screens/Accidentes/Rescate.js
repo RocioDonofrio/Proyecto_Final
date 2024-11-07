@@ -37,7 +37,7 @@ const Rescate = ({ navigation }) => {
     >
       <View style={styles.header}>
         <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Ionicons name="arrow-back" size={24} color="#fae12f" />
+          <Ionicons name="arrow-back" size={50} color="#fae12f" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Reporte de Rescate</Text>
       </View>

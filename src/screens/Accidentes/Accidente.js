@@ -77,7 +77,7 @@ export default function EnviarFormulario() {
       >
         <View style={styles.header}>
           <TouchableOpacity onPress={() => navigation.goBack()}>
-            <Ionicons name="arrow-back" size={40} color="black" />
+            <Ionicons name="arrow-back" size={50} color="black" />
           </TouchableOpacity>
           <Text style={styles.title}>Reporte de Accidente</Text>
         </View>
@@ -96,7 +96,6 @@ export default function EnviarFormulario() {
           />
         </View>
 
-        {/* Tipo de Accidente */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="alert-circle" size={30} color="#e53935" />
@@ -111,7 +110,6 @@ export default function EnviarFormulario() {
           />
         </View>
 
-        {/* Descripción */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="document-text-outline" size={30} color="#e53935" />
@@ -127,7 +125,6 @@ export default function EnviarFormulario() {
           />
         </View>
 
-        {/* Personas Rescatadas */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="people" size={30} color="#e53935" />
@@ -143,7 +140,6 @@ export default function EnviarFormulario() {
           />
         </View>
 
-        {/* Observaciones */}
         <View style={styles.formGroup}>
           <View style={styles.labelContainer}>
             <Ionicons name="information-circle" size={30} color="#e53935" />
@@ -159,7 +155,6 @@ export default function EnviarFormulario() {
           />
         </View>
 
-        {/* Botón de Enviar */}
         <TouchableOpacity style={styles.button} onPress={handleEnviarCorreo}>
           <Text style={styles.buttonText}>Enviar Reporte</Text>
         </TouchableOpacity>

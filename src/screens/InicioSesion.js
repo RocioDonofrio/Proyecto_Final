@@ -6,12 +6,12 @@ import {
   TouchableOpacity,
   StyleSheet,
   Alert,
-  KeyboardAvoidingView,
   ScrollView,
   ActivityIndicator,
   RefreshControl,
   Platform,
   Image,
+  KeyboardAvoidingView,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import appFirebase from "../../credenciales";
@@ -108,8 +108,8 @@ export default function Login() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === "ios" ? "padding" : undefined}
-      keyboardVerticalOffset={100}
+      behavior={Platform.OS === "ios" ? "padding" : "height"}
+      keyboardVerticalOffset={Platform.OS === "ios" ? 0 : 20}
     >
       <ScrollView
         contentContainerStyle={{ flexGrow: 1 }}
@@ -218,7 +218,6 @@ const styles = StyleSheet.create({
     height: 250,
     zIndex: 2,
   },
-
   input: {
     borderWidth: 1,
     padding: 15,

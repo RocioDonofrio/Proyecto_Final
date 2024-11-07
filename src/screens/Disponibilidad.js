@@ -26,15 +26,14 @@ export default function PerfilUsuario() {
   const [selectedOption, setSelectedOption] = useState("");
   const [loading, setLoading] = useState(true);
   const { theme } = useTheme();
-  const [userId, setUserId] = useState(null); // Para almacenar el ID del usuario autenticado
+  const [userId, setUserId] = useState(null);
 
   useEffect(() => {
     const fetchUsersData = async () => {
       try {
-        // Obtener el usuario autenticado
         const user = auth.currentUser;
         if (user) {
-          setUserId(user.uid); // Guardamos el UID del usuario autenticado
+          setUserId(user.uid);
         }
 
         const querySnapshot = await getDocs(collection(firestore, "usuarios"));
@@ -59,6 +58,15 @@ export default function PerfilUsuario() {
       await updateDoc(docRef, {
         opcionSeleccionada: selectedOption,
       });
+
+      setUsuarios((prevUsuarios) =>
+        prevUsuarios.map((user) =>
+          user.id === userIdToUpdate
+            ? { ...user, opcionSeleccionada: selectedOption }
+            : user
+        )
+      );
+
       Alert.alert("Actualización exitosa", "La opción ha sido guardada.");
     } catch (error) {
       console.error("Error al actualizar la opción:", error);
@@ -162,6 +170,7 @@ const styles = StyleSheet.create({
     borderColor: "#ccc",
     width: "90%",
     alignItems: "center",
+    justifyContent: "center",
   },
   profileHeader: {
     flexDirection: "row",
@@ -223,5 +232,6 @@ const styles = StyleSheet.create({
   otherUsersSection: {
     marginTop: 20,
     width: "100%",
+    alignItems: "center",
   },
 });

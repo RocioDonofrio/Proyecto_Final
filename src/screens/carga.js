@@ -5,7 +5,7 @@ const Carga = ({ navigation }) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       navigation.replace("InicioSesion");
-    }, 3000);
+    }, 2000);
 
     return () => clearTimeout(timer);
   }, [navigation]);

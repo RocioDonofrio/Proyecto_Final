@@ -55,7 +55,7 @@ export default function Configuracion() {
     try {
       await signOut(auth);
       Alert.alert("Sesión cerrada", "Has cerrado sesión correctamente.");
-      navigation.navigate("InicioSesion");
+      navigation.replace("InicioSesion");
     } catch (error) {
       Alert.alert("Error", error.message);
     }

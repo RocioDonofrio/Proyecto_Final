@@ -1,30 +1,52 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { lightTheme, darkTheme } from "../styles/themeStyles";
+import { auth, db } from "../../credenciales";
+import { doc, getDoc, updateDoc } from "firebase/firestore";
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(lightTheme);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Elimina la parte que carga el tema de AsyncStorage
-    // const loadTheme = async () => {
-    //   const storedTheme = await AsyncStorage.getItem("theme");
-    //   if (storedTheme) {
-    //     setTheme(storedTheme === "dark" ? darkTheme : lightTheme);
-    //   }
-    // };
-    // loadTheme();
-    // Ahora siempre inicia con el tema claro o cualquier otro que prefieras
-    setTheme(lightTheme); // El tema predeterminado es claro
+    const loadThemeFromFirestore = async () => {
+      const userInfo = auth.currentUser;
+      if (userInfo) {
+        const userDocRef = doc(db, "usuarios", userInfo.uid);
+        const userDoc = await getDoc(userDocRef);
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          const storedTheme = data.modo;
+          if (storedTheme === "dark") {
+            setTheme(darkTheme);
+          } else {
+            setTheme(lightTheme);
+          }
+        }
+      }
+      setLoading(false);
+    };
+
+    loadThemeFromFirestore();
   }, []);
 
-  const toggleTheme = () => {
+  const toggleTheme = async () => {
     const newTheme = theme === lightTheme ? darkTheme : lightTheme;
-    setTheme(newTheme); // Cambiar el tema sin usar AsyncStorage
-    // Elimina la parte que guarda el tema en AsyncStorage
-    // await AsyncStorage.setItem("theme", newTheme === darkTheme ? "dark" : "light");
+    setTheme(newTheme);
+
+    const userInfo = auth.currentUser;
+    if (userInfo) {
+      const userDocRef = doc(db, "usuarios", userInfo.uid);
+      await updateDoc(userDocRef, {
+        modo: newTheme === darkTheme ? "dark" : "light",
+      });
+    }
   };
+
+  if (loading) {
+    return <></>;
+  }
 
   return (
     <ThemeContext.Provider value={{ theme, toggleTheme }}>

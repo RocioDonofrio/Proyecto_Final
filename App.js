@@ -1,7 +1,6 @@
 import Carga from "./src/screens/carga";
 import InicioSesion from "./src/screens/InicioSesion";
 import Registro from "./src/screens/Registro";
-
 import EnviarAlerta from "./src/screens/EnviarAlerta";
 import Disponibilidad from "./src/screens/Disponibilidad";
 import Ayuda from "./src/screens/Ayuda";
@@ -12,7 +11,6 @@ import Header from "./src/components/Header";
 import Configuracion from "./src/screens/Configuracion";
 import EditProfile from "./src/screens/EditProfile";
 import { ThemeProvider } from "./src/context/ThemeContext";
-
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 
@@ -32,12 +30,7 @@ export default function App() {
             <Stack.Screen
               name="InicioSesion"
               component={InicioSesion}
-              options={{
-                title: "LOGIN",
-                headerTintColor: "white",
-                headerTitleAlign: "center",
-                headerStyle: { backgroundColor: "#6b1818" },
-              }}
+              options={{ headerShown: false }}
             />
             <Stack.Screen
               name="Registro"
@@ -55,7 +48,7 @@ export default function App() {
               name="EnviarAlerta"
               component={EnviarAlerta}
               options={{
-                header: () => <Header title="Enviar " />,
+                header: () => <Header title="Enviar Alerta" />,
               }}
             />
             <Stack.Screen
@@ -101,13 +94,6 @@ export default function App() {
               component={EditProfile}
               options={{
                 header: () => <Header title="EditProfile" />,
-              }}
-            />
-            <Stack.Screen
-              name="Header"
-              component={Header}
-              options={{
-                header: () => <Header title="Header" />,
               }}
             />
           </Stack.Navigator>

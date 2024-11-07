@@ -7,8 +7,10 @@ import { useTheme } from "../context/ThemeContext";
 const Header = ({ title }) => {
   const [isModalVisible, setModalVisible] = useState(false);
   const navigation = useNavigation();
-
   const { theme, toggleTheme } = useTheme();
+
+  const currentRoute =
+    navigation.getState().routes[navigation.getState().index].name;
 
   const toggleModal = () => {
     setModalVisible(!isModalVisible);
@@ -29,9 +31,11 @@ const Header = ({ title }) => {
       </View>
 
       <View style={styles.navigation}>
-        <TouchableOpacity onPress={() => navigation.goBack()}>
-          <Text style={styles.backText}>←</Text>
-        </TouchableOpacity>
+        {currentRoute !== "EnviarAlerta" && (
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Text style={styles.backText}>←</Text>
+          </TouchableOpacity>
+        )}
         <Text style={styles.title}>{title}</Text>
       </View>
 
