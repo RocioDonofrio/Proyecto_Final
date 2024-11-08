@@ -5,13 +5,13 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    padding: 25,
+    padding: 7,
     backgroundColor: "#850a0a",
   },
   logo: {
-    width: 50,
-    height: 50,
-    borderRadius: 10,
+    width: 60,
+    height: 60,
+    borderRadius: 15,
   },
   menuText: {
     fontSize: 50,

@@ -9,12 +9,12 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
-    padding: 20,
+    padding: 10,
   },
   button: {
-    padding: 20,
-    borderRadius: 20,
-    marginBottom: 35,
+    padding: 40,
+    borderRadius: 30,
+    marginBottom: 45,
     width: "90%",
     alignItems: "center",
   },
@@ -32,7 +32,7 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: "#fff",
-    fontSize: 25,
+    fontSize: 35,
     fontWeight: "bold",
   },
 });

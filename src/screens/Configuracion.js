@@ -139,7 +139,6 @@ export default function Configuracion() {
     </View>
   );
 }
-
 // Estilos
 const styles = StyleSheet.create({
   container: {
@@ -148,6 +147,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     backgroundColor: "#f9f9f9",
     padding: 20,
+    paddingTop: 40, // Añadido para bajar todo el contenido
   },
   profilePicture: {
     width: 210,
@@ -155,7 +155,7 @@ const styles = StyleSheet.create({
     borderRadius: 105,
     justifyContent: "center",
     alignItems: "center",
-    marginTop: -160,
+    marginTop: 15, // Ajustado para bajar la imagen de perfil
   },
   numberText: {
     color: "#fff",
